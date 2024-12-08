@@ -15,7 +15,7 @@
 使用vue开发。
 
 目录：
-[Front](/Front/)
+[Front](/vue-frontend/)
 
 后端：
 
