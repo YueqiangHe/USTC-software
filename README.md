@@ -10,7 +10,7 @@
 
 分为前端和后端。
 
-前端语言：java(目录：
-[Front](/Front/))
+前端:目录：
+[Front](/Front/)
 
-后端语言：mySQL(目录：[Back](/Back/))
+后端：目录：[Back](/Back/)
