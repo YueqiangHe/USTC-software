@@ -10,7 +10,15 @@
 
 分为前端和后端。
 
-前端：目录：
+前端：
+
+使用vue开发。
+
+目录：
 [Front](/Front/)
 
-后端：目录：[Back](/Back/)
+后端：
+
+使用spring boot框架开发。
+
+目录：[Back](/Back/)
