@@ -18,8 +18,12 @@
     "papaparse": "^5.4.1",
     "vue": "^3.5.13",
     "vue-chartjs": "^5.3.2",
+<<<<<<< HEAD
     "vue-router": "^4.5.0",
     "vuetify": "^3.7.5"
+=======
+    "vue-router": "^4.5.0"
+>>>>>>> 97f1926 (finish)
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

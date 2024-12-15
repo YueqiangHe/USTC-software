@@ -58,8 +58,12 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isAuthenticated) {
       next({ path: '/' })
+<<<<<<< HEAD
     } else if (to.matched.some(record => record.meta.role === userRole)) {
       console.log('User role:', userRole)
+=======
+    } else if (userRole != 'admin' && userRole != 'student' && userRole != 'teacher') {
+>>>>>>> 97f1926 (finish)
       next({ path: '/' })
     } else {
       next()
