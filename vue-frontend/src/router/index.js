@@ -51,21 +51,21 @@ const router = createRouter({
 })
 
 // 路由守卫，检查用户是否已经登录并具有权限
-// router.beforeEach((to, from, next) => {
-//   const userRole = localStorage.getItem('role')  // 假设登录信息保存在localStorage中
-//   const isAuthenticated = !!localStorage.getItem('token')
+router.beforeEach((to, from, next) => {
+  const userRole = localStorage.getItem('role')  // 假设登录信息保存在localStorage中
+  const isAuthenticated = localStorage.getItem('token')
 
-//   if (to.meta.requiresAuth) {
-//     if (!isAuthenticated) {
-//       next({ name: 'Home' })  // 重定向到登录页面
-//     } else if (to.meta.role && userRole !== to.meta.role) {
-//       next({ name: 'Home' })  // 权限不足，重定向到登录页面
-//     } else {
-//       next()
-//     }
-//   } else {
-//     next()
-//   }
-// })
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      next({ path: '/' })
+    } else if (userRole != 'admin' && userRole != 'student' && userRole != 'teacher') {
+      next({ path: '/' })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
 
 export default router

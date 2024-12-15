@@ -1,154 +1,188 @@
 <template>
-    <div class="admin-dashboard">
-      <h2>管理员界面</h2>
-      <p>欢迎，{{ username }}！</p>
-  
-      <!-- 用户信息表格 -->
-      <div>
-        <h3>用户管理</h3>
-        <button @click="openAddUserDialog">新增用户</button>
-        <table>
-          <thead>
-            <tr>
-              <th>账号</th>
-              <th>密码</th>
-              <th>姓名</th>
-              <th>角色</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(user, index) in users" :key="index">
-              <td>{{ user.username }}</td>
-              <td>{{ user.password }}</td>
-              <td>{{ user.name }}</td>
-              <td>{{ user.role }}</td>
-              <td>
-                <button @click="openEditUserDialog(user)">编辑</button>
-                <button @click="deleteUser(index)">删除</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-  
-      <!-- 编辑用户弹窗 -->
-      <div v-if="isEditUserDialogOpen" class="dialog">
-        <div class="dialog-content">
-          <h3>{{ isEditingNewUser ? '新增用户' : '编辑用户' }}</h3>
-          <form @submit.prevent="saveUser">
-            <div>
-              <label for="username">账号：</label>
-              <input v-model="editingUser.username" id="username" required />
-            </div>
-            <div>
-              <label for="password">密码：</label>
-              <input v-model="editingUser.password" id="password" required type="password" />
-            </div>
-            <div>
-              <label for="name">姓名：</label>
-              <input v-model="editingUser.name" id="name" required />
-            </div>
-            <div>
-              <label for="role">角色：</label>
-              <select v-model="editingUser.role" id="role">
-                <option value="student">学生</option>
-                <option value="teacher">教师</option>
-                <option value="admin">管理员</option>
-              </select>
-            </div>
-            <button type="submit">保存</button>
-            <button type="button" @click="closeEditUserDialog">取消</button>
-          </form>
-        </div>
-      </div>
+  <div class="admin-dashboard">
+    <h2>管理员界面</h2>
+    <p>欢迎，{{ username }}！</p>
+
+    <!-- 用户信息表格 -->
+    <div>
+      <h3>用户管理</h3>
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>密码</th>
+            <th>账号</th>
+            <th>角色</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, index) in users" :key="index">
+            <td>{{ user.id }}</td>
+            <td>{{ user.password }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+              <button class="delete-btn" @click="deleteUser(user.id, index)">删除</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        username: "管理员", // 当前登录管理员的账号
-        users: [
-          { username: "user1", password: "123456", name: "张三", role: "student" },
-          { username: "user2", password: "abcdef", name: "李四", role: "teacher" },
-          { username: "admin", password: "admin123", name: "管理员", role: "admin" },
-        ], // 用户列表
-        isEditUserDialogOpen: false,
-        editingUser: null,
-        isEditingNewUser: false, // 用于区分是新增用户还是编辑现有用户
-      };
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      username: '管理员', // 当前登录用户名
+      users: [], // 用户数据
+      isEditUserDialogOpen: false, // 编辑用户弹窗是否打开
+      editingUser: null, // 当前编辑的用户对象
+      isEditingNewUser: false, // 是否是新增用户
+    };
+  },
+  mounted() {
+    this.fetchUsers(); // 获取所有用户
+  },
+  methods: {
+    // 获取用户数据
+    async fetchUsers() {
+      try {
+        const response = await fetch('http://localhost:5000/api/getall');
+        const data = await response.json();
+        this.users = data; // 更新用户数据
+      } catch (error) {
+        console.error('获取用户数据失败:', error);
+      }
     },
-    methods: {
-      openEditUserDialog(user) {
-        this.editingUser = { ...user }; // 深拷贝用户数据，防止直接修改原数据
-        this.isEditingNewUser = false;
-        this.isEditUserDialogOpen = true;
-      },
-      openAddUserDialog() {
-        this.editingUser = { username: "", password: "", name: "", role: "student" }; // 新用户默认值
-        this.isEditingNewUser = true;
-        this.isEditUserDialogOpen = true;
-      },
-      closeEditUserDialog() {
-        this.isEditUserDialogOpen = false;
-        this.editingUser = null;
-      },
-      saveUser() {
-        if (this.isEditingNewUser) {
-          this.users.push({ ...this.editingUser }); // 新增用户
-        } else {
-          const index = this.users.findIndex((user) => user.username === this.editingUser.username);
-          if (index !== -1) {
-            this.users.splice(index, 1, { ...this.editingUser }); // 更新用户数据
-          }
-        }
-        this.closeEditUserDialog();
-      },
-      deleteUser(index) {
-        if (confirm("确定要删除这个用户吗？")) {
-          this.users.splice(index, 1);
-        }
-      },
+    // 打开新增用户弹窗
+    openAddUserDialog() {
+      this.isEditUserDialogOpen = true;
+      this.isEditingNewUser = true;
+      this.editingUser = { id: '', username: '', password: '', role: '' };
     },
-  };
-  </script>
-  
-  <style scoped>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  th, td {
-    padding: 10px;
-    border: 1px solid #ccc;
-    text-align: left;
-  }
-  
-  button {
-    margin-right: 5px;
-  }
-  
-  .dialog {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .dialog-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-  }
-  </style>
-  
+    // 打开编辑用户弹窗
+    openEditUserDialog(user) {
+      this.isEditUserDialogOpen = true;
+      this.isEditingNewUser = false;
+      this.editingUser = { ...user }; // 深拷贝用户数据
+    },
+    // 删除用户
+    async deleteUser(userId, index) {
+      if (confirm('确定删除此用户吗?')) {
+        await fetch(`http://localhost:5000/api/rm/${userId}`, { method: 'DELETE' });
+        this.users.splice(index, 1); // 从本地删除
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+.admin-dashboard {
+  background-color: #eafaf1; /* 浅绿色背景 */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+  max-width: 1000px; /* 限制内容宽度 */
+  margin: 20px auto; /* 居中页面 */
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 8px 16px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.add-user-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  font-size: 14px;
+}
+
+.edit-btn {
+  background-color: #FFA500;
+  color: white;
+  border: none;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+td {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+.dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.dialog-actions button {
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dialog-actions button:first-child {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.dialog-actions button:last-child {
+  background-color: #f44336;
+  color: white;
+}
+</style>
