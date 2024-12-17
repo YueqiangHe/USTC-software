@@ -7,6 +7,11 @@ const userRoutes = require('./routes/user');  // 引入用户路由
 const app = express();
 const port = 5000;
 
+// 添加健康检查路由
+app.get('/', (req, res) => {
+  res.status(200).send('服务器运行中');
+});
+
 // 使用 CORS 中间件，允许来自 http://localhost:8080 的请求
 app.use(cors({
   origin: 'http://localhost:8080',  // 允许的前端地址
@@ -24,3 +29,6 @@ app.use('/api', userRoutes);
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
+// 导出 app 用于测试
+module.exports = app;
